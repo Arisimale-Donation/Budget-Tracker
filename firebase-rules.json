@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "accounts": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    ".read": "auth != null",
+    ".write": "auth != null"
+  }
+}
+

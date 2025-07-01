@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Dual Dashboard System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar-collapsed {
+            width: 4rem;
+        }
+        .sidebar-collapsed .sidebar-text {
+            display: none;
+        }
+        .sidebar-collapsed .sidebar-icon {
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex min-h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar" class="w-64 bg-gray-800 text-white min-h-screen transition-all duration-300 ease-in-out">
+        <div class="p-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-xl font-bold sidebar-text">Admin Panel</h1>
+                <button id="sidebarToggle" class="text-white hover:text-gray-300">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <nav class="mt-8">
+            <ul>
+                <li class="mb-2">
+                    <a href="#" data-section="dashboard" class="nav-link flex items-center py-3 px-4 hover:bg-gray-700 transition-colors duration-200 sidebar-icon">
+                        <i class="fas fa-tachometer-alt w-6"></i>
+                        <span class="ml-3 sidebar-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" data-section="subadmins" class="nav-link flex items-center py-3 px-4 hover:bg-gray-700 transition-colors duration-200 sidebar-icon">
+                        <i class="fas fa-users-cog w-6"></i>
+                        <span class="ml-3 sidebar-text">Sub-Admins</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" data-section="financial" class="nav-link flex items-center py-3 px-4 hover:bg-gray-700 transition-colors duration-200 sidebar-icon">
+                        <i class="fas fa-dollar-sign w-6"></i>
+                        <span class="ml-3 sidebar-text">Financial</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" data-section="items" class="nav-link flex items-center py-3 px-4 hover:bg-gray-700 transition-colors duration-200 sidebar-icon">
+                        <i class="fas fa-box-open w-6"></i>
+                        <span class="ml-3 sidebar-text">Items</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" data-section="history" class="nav-link flex items-center py-3 px-4 hover:bg-gray-700 transition-colors duration-200 sidebar-icon">
+                        <i class="fas fa-history w-6"></i>
+                        <span class="ml-3 sidebar-text">History</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" data-section="settings" class="nav-link flex items-center py-3 px-4 hover:bg-gray-700 transition-colors duration-200 sidebar-icon">
+                        <i class="fas fa-cog w-6"></i>
+                        <span class="ml-3 sidebar-text">Settings</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" data-logout class="flex items-center py-3 px-4 hover:bg-red-600 transition-colors duration-200 sidebar-icon">
+                        <i class="fas fa-sign-out-alt w-6"></i>
+                        <span class="ml-3 sidebar-text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b p-4 flex justify-between items-center">
+            <div>
+                <h2 id="pageTitle" class="text-2xl font-semibold text-gray-800">Dashboard Overview</h2>
+                <p class="text-gray-600 text-sm">Welcome back, <span data-user-name>Admin</span></p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button id="notificationBtn" class="p-2 text-gray-600 hover:text-gray-800 relative">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                </div>
+                <div class="relative">
+                    <input type="text" id="globalSearch" placeholder="Search..." 
+                           class="border border-gray-300 rounded-lg py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                    <span class="text-gray-700 font-medium" data-user-name>Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 overflow-y-auto">
+            <!-- Dashboard Overview Section -->
+            <div id="dashboard-section" class="section">
+                <!-- Key Metrics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium">Main Account Balance</p>
+                                <p id="mainBalance" class="text-3xl font-bold text-green-600">$0</p>
+                            </div>
+                            <div class="p-3 bg-green-100 rounded-full">
+                                <i class="fas fa-wallet text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium">Total Sub-Admins</p>
+                                <p id="totalSubAdmins" class="text-3xl font-bold text-blue-600">0</p>
+                            </div>
+                            <div class="p-3 bg-blue-100 rounded-full">
+                                <i class="fas fa-users text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium">Money Distributed</p>
+                                <p id="moneyDistributed" class="text-3xl font-bold text-orange-600">$0</p>
+                            </div>
+                            <div class="p-3 bg-orange-100 rounded-full">
+                                <i class="fas fa-arrow-up text-orange-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium">Money Returned</p>
+                                <p id="moneyReturned" class="text-3xl font-bold text-purple-600">$0</p>
+                            </div>
+                            <div class="p-3 bg-purple-100 rounded-full">
+                                <i class="fas fa-arrow-down text-purple-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity and Quick Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
+                        <div id="recentActivity" class="space-y-3">
+                            <div class="text-gray-500 text-center py-8">
+                                <i class="fas fa-history text-3xl mb-2"></i>
+                                <p>No recent activity</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button id="addSubAdminBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-user-plus mb-2"></i>
+                                <br>Add Sub-Admin
+                            </button>
+                            <button id="transferMoneyBtn" class="bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-money-bill-transfer mb-2"></i>
+                                <br>Transfer Money
+                            </button>
+                            <button id="assignItemsBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-box mb-2"></i>
+                                <br>Assign Items
+                            </button>
+                            <button id="viewReportsBtn" class="bg-purple-500 hover:bg-purple-600 text-white py-3 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-chart-bar mb-2"></i>
+                                <br>View Reports
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-Admins Section -->
+            <div id="subadmins-section" class="section hidden">
+                <div class="bg-white rounded-lg shadow-sm border">
+                    <div class="p-6 border-b">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-semibold">Sub-Admin Management</h3>
+                            <button id="addNewSubAdmin" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-plus mr-2"></i>Add Sub-Admin
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-4 flex space-x-4">
+                            <input type="text" id="subAdminSearch" placeholder="Search sub-admins..." 
+                                   class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="subAdminStatusFilter" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div id="subAdminsList" class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subAdminsTableBody" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No sub-admins found</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Management Section -->
+            <div id="financial-section" class="section hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Add Money to Main Account</h3>
+                        <form id="addMoneyForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Amount</label>
+                                <input type="number" id="addMoneyAmount" step="0.01" min="0" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                       placeholder="Enter amount">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Source</label>
+                                <select id="moneySource" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select source</option>
+                                    <option value="client_payment">Client Payment</option>
+                                    <option value="investment">Investment</option>
+                                    <option value="loan">Loan</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                                <textarea id="moneyDescription" rows="3" 
+                                          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                          placeholder="Enter description"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-plus mr-2"></i>Add Money
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Transfer Money to Sub-Admin</h3>
+                        <form id="transferMoneyForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Select Sub-Admin</label>
+                                <select id="transferToSubAdmin" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select sub-admin</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Amount</label>
+                                <input type="number" id="transferAmount" step="0.01" min="0" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                       placeholder="Enter amount">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">description</label>
+                                <textarea id="transferdescription" rows="3" 
+                                          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                          placeholder="Enter description"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-paper-plane mr-2"></i>Transfer Money
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Section -->
+            <div id="items-section" class="section hidden">
+                <div class="bg-white rounded-lg shadow-sm border">
+                    <div class="p-6 border-b">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-semibold">Item Management</h3>
+                            <button id="addNewItem" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-plus mr-2"></i>Add Item
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div id="itemsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="text-center text-gray-500 col-span-full py-8">
+                                <i class="fas fa-box text-3xl mb-2"></i>
+                                <p>No items found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div id="history-section" class="section hidden">
+                <div class="bg-white rounded-lg shadow-sm border">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">Transaction History</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-4 flex space-x-4">
+                            <input type="date" id="historyFromDate" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="date" id="historyToDate" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="historyTypeFilter" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">All Types</option>
+                                <option value="money_given">Money Given</option>
+                                <option value="money_returned">Money Returned</option>
+                                <option value="purchase">Purchase</option>
+                                <option value="transfer">Transfer</option>
+                            </select>
+                            <button id="exportHistory" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-download mr-2"></i>Export
+                            </button>
+                        </div>
+                        <div id="historyList" class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From/To</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No transactions found</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="section hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Profile Settings</h3>
+                        <form id="profileForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                                <input type="text" id="profileName" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                <input type="email" id="profileEmail" readonly 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-gray-100">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Phone</label>
+                                <input type="tel" id="profilePhone" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-save mr-2"></i>Update Profile
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Change Password</h3>
+                        <form id="passwordForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Current Password</label>
+                                <input type="password" id="currentPassword" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">New Password</label>
+                                <input type="password" id="newPassword" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Confirm New Password</label>
+                                <input type="password" id="confirmNewPassword" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+                                <i class="fas fa-key mr-2"></i>Change Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals will be added here dynamically -->
+    <div id="modalContainer"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    <script src="./js/admin.js"></script>
+</body>
+</html>
+

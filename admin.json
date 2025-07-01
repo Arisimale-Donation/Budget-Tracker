@@ -1,0 +1,12 @@
+{
+    "users": {
+      "gkXyoEY9iJQDjggYoRvdVulHzoq1": {
+        "name": "System Administrator",
+        "email": "mudithaexlporing@gmail.com",
+        "role": "admin",
+        "phone": "0729186299",
+        "status": "active",
+        "createdAt": 1640995200000
+      }
+    }
+  }

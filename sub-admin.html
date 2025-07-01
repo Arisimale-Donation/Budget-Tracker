@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub-Admin Dashboard - Dual Dashboard System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MY WALLET">
+    <link rel="apple-touch-icon" href="images/app_icon.png">
+    <style>
+        /* Mobile-first custom styles */
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .bottom-nav {
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .swipe-indicator {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: swipe 2s infinite;
+        }
+        @keyframes swipe {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .section {
+            min-height: calc(100vh - 140px);
+        }
+        .item-card:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease-in-out;
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-20">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b p-4 sticky top-0 z-40">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800">Dashboard</h2>
+                <p class="text-gray-600 text-sm">Welcome, <span data-user-name>Sub-Admin</span></p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="notificationBtn" class="p-2 text-gray-600 hover:text-gray-800 relative">
+                    <i class="fas fa-bell text-lg"></i>
+                    <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
+                </button>
+                <button id="refreshBtn" class="p-2 text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-sync-alt text-lg"></i>
+                </button>
+                <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-white text-sm"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4 pb-24">
+        <!-- Home Section -->
+        <div id="home-section" class="section">
+            <!-- Balance Card -->
+            <div class="balance-card text-white p-6 rounded-2xl card-shadow mb-6 relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-purple-100 text-sm font-medium">Current Balance</p>
+                            <p id="currentBalance" class="text-3xl font-bold">$0.00</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-purple-100 text-xs">Last Updated</p>
+                            <p id="lastUpdated" class="text-sm">Just now</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Budget Usage</span>
+                            <span id="budgetPercentage">0%</span>
+                        </div>
+                        <div class="w-full bg-purple-400 bg-opacity-30 rounded-full h-2">
+                            <div id="budgetProgress" class="bg-white h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button id="requestMoneyBtn" class="flex-1 bg-white bg-opacity-20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-medium hover:bg-opacity-30 transition-all duration-200">
+                            <i class="fas fa-plus mr-2"></i>Request Money
+                        </button>
+                        <button id="transferBalanceBtn" class="flex-1 bg-white bg-opacity-20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-medium hover:bg-opacity-30 transition-all duration-200">
+                            <i class="fas fa-paper-plane mr-2"></i>Transfer
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Animated background -->
+                <div class="absolute inset-0 opacity-10">
+                    <div class="swipe-indicator absolute inset-0"></div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-xl card-shadow">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-arrow-down text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 text-xs">Total Received</p>
+                            <p id="totalReceived" class="text-lg font-bold text-gray-800">$0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-xl card-shadow">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-shopping-cart text-red-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 text-xs">Total Spent</p>
+                            <p id="totalSpent" class="text-lg font-bold text-gray-800">$0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Money History -->
+            <div class="bg-white rounded-xl card-shadow mb-6">
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-semibold text-gray-800">Recent Money History</h3>
+                        <button id="viewAllMoneyHistory" class="text-purple-600 text-sm font-medium">View All</button>
+                    </div>
+                </div>
+                <div id="recentMoneyHistory" class="p-4">
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-history text-2xl mb-2"></i>
+                        <p class="text-sm">No recent money history</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Purchases -->
+            <div class="bg-white rounded-xl card-shadow mb-6">
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-semibold text-gray-800">Recent Purchases</h3>
+                        <button id="viewAllPurchases" class="text-purple-600 text-sm font-medium">View All</button>
+                    </div>
+                </div>
+                <div id="recentPurchases" class="p-4">
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-shopping-bag text-2xl mb-2"></i>
+                        <p class="text-sm">No recent purchases</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 gap-4">
+                <button id="shopItemsBtn" class="bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl card-shadow font-medium">
+                    <i class="fas fa-shopping-cart text-xl mb-2"></i>
+                    <br>Shop Items
+                </button>
+                <button id="viewHistoryBtn" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 rounded-xl card-shadow font-medium">
+                    <i class="fas fa-history text-xl mb-2"></i>
+                    <br>View History
+                </button>
+            </div>
+        </div>
+
+        <!-- Shop Section -->
+        <div id="shop-section" class="section hidden">
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Available Items</h3>
+                    <div class="flex items-center space-x-2">
+                        <button id="cartBtn" class="relative p-2 bg-purple-600 text-white rounded-lg">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search and Filter -->
+                <div class="mb-4">
+                    <div class="relative">
+                        <input type="text" id="itemSearch" placeholder="Search items..." 
+                               class="w-full border border-gray-300 rounded-lg py-3 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <i class="fas fa-search absolute right-3 top-4 text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="itemsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="text-center text-gray-500 col-span-full py-12">
+                    <i class="fas fa-box text-3xl mb-4"></i>
+                    <p>No items available</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="history-section" class="section hidden">
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4">Transaction History</h3>
+                
+                <!-- Filter Tabs -->
+                <div class="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-4">
+                    <button class="history-tab flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 bg-white text-purple-600 shadow-sm" data-type="all">All</button>
+                    <button class="history-tab flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 text-gray-600" data-type="money_received">Money</button>
+                    <button class="history-tab flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 text-gray-600" data-type="purchase">Purchases</button>
+                    <button class="history-tab flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 text-gray-600" data-type="transfer">Transfers</button>
+                </div>
+            </div>
+            
+            <div id="historyList" class="space-y-3">
+                <div class="text-center text-gray-500 py-12">
+                    <i class="fas fa-history text-3xl mb-4"></i>
+                    <p>No transaction history</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings-section" class="section hidden">
+            <div class="space-y-6">
+                <!-- Profile Card -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4">Profile Information</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Name</label>
+                            <p class="text-gray-800 font-medium" data-user-name>Sub-Admin</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Email</label>
+                            <p class="text-gray-800" data-user-email>subadmin@example.com</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Role</label>
+                            <p class="text-gray-800" data-user-role>Sub-Administrator</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="space-y-3">
+                    <button id="changePasswordBtn" class="w-full bg-white rounded-xl card-shadow p-4 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-key text-blue-600"></i>
+                            </div>
+                            <span class="font-medium">Change Password</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                    
+                    <button id="notificationSettingsBtn" class="w-full bg-white rounded-xl card-shadow p-4 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-bell text-yellow-600"></i>
+                            </div>
+                            <span class="font-medium">Notifications</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                    
+                    <button data-logout class="w-full bg-white rounded-xl card-shadow p-4 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-sign-out-alt text-red-600"></i>
+                            </div>
+                            <span class="font-medium text-red-600">Sign Out</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white bottom-nav z-50">
+        <div class="flex justify-around items-center py-2">
+            <button class="nav-btn flex flex-col items-center py-2 px-4 text-purple-600" data-section="home">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs font-medium">Home</span>
+            </button>
+            <button class="nav-btn flex flex-col items-center py-2 px-4 text-gray-500" data-section="shop">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs font-medium">Shop</span>
+            </button>
+            <button class="nav-btn flex flex-col items-center py-2 px-4 text-gray-500" data-section="history">
+                <i class="fas fa-history text-xl mb-1"></i>
+                <span class="text-xs font-medium">History</span>
+            </button>
+            <button class="nav-btn flex flex-col items-center py-2 px-4 text-gray-500" data-section="settings">
+                <i class="fas fa-cog text-xl mb-1"></i>
+                <span class="text-xs font-medium">Settings</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50 hidden">
+        <div class="bg-white rounded-t-2xl w-full max-h-96 overflow-y-auto">
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">Shopping Cart</h3>
+                    <button id="closeCartModal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="cartItems" class="p-4">
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fas fa-shopping-cart text-3xl mb-2"></i>
+                    <p>Your cart is empty</p>
+                </div>
+            </div>
+            <div id="cartFooter" class="p-4 border-t border-gray-200 hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-semibold">Total:</span>
+                    <span id="cartTotal" class="text-lg font-bold text-purple-600">$0.00</span>
+                </div>
+                <button id="checkoutBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium">
+                    <i class="fas fa-credit-card mr-2"></i>Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modalContainer"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    <script src="./js/sub-admin.js"></script>
+</body>
+</html>
+
