@@ -1,14 +1,14 @@
 const CACHE_NAME = 'dashboard-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/login.html',
-  '/sub-admin.html',
-  '/manifest.json',
-  '/css/custom.css',
-  '/js/auth.js',
-  '/js/login.js',
-  '/js/sub-admin.js',
-  '/js/firebase-config.js',
+  '/Budget-Tracker/',
+  '/Budget-Tracker/login.html',
+  '/Budget-Tracker/sub-admin.html',
+  '/Budget-Tracker/manifest.json',
+  '/Budget-Tracker/css/custom.css',
+  '/Budget-Tracker/js/auth.js',
+  '/Budget-Tracker/js/login.js',
+  '/Budget-Tracker/js/sub-admin.js',
+  '/Budget-Tracker/js/firebase-config.js',
   'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'
 ];
