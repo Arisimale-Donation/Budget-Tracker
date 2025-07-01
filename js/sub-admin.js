@@ -608,17 +608,10 @@ async function handleCheckout() {
         const newTransactionRef = database.ref('transactions').push();
         await newTransactionRef.set(transaction);
         
-        // Update balances
-        await Promise.all([
-            // Reduce sub-admin's balance
-            database.ref(`accounts/${currentUser.uid}/balance`).transaction(balance => {
-                return (balance || 0) - total;
-            }),
-            // Increase admin's balance
-            database.ref(`accounts/${adminId}/balance`).transaction(balance => {
-                return (balance || 0) + total;
-            })
-        ]);
+        // Update only sub-admin's balance (reduce it)
+        await database.ref(`accounts/${currentUser.uid}/balance`).transaction(balance => {
+            return (balance || 0) - total;
+        });
         
         // Update item quantities
         for (const item of shoppingCart) {
