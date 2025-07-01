@@ -8,8 +8,19 @@
       ".read": "auth != null",
       ".write": "auth != null"
     },
+    "transactions": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "items": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "itemAssignments": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
     ".read": "auth != null",
     ".write": "auth != null"
   }
 }
-

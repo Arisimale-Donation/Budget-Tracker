@@ -53,6 +53,7 @@ function setupEventListeners() {
     document.getElementById('itemSearch').addEventListener('input', filterItems);
     document.getElementById('closeCartModal').addEventListener('click', hideCartModal);
     document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
+    document.getElementById('addItemBtn').addEventListener('click', showAddItemModal);
     
     // History tabs
     document.querySelectorAll('.history-tab').forEach(tab => {
@@ -348,20 +349,107 @@ function getItemName(itemId) {
     return availableItems[itemId]?.name || 'Unknown Item';
 }
 
+// Show add item modal
+function showAddItemModal() {
+    const modalContent = `
+        <form id="addItemForm" class="space-y-4">
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Item Name</label>
+                <input type="text" id="itemName" required
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Quantity</label>
+                <input type="number" id="itemQuantity" required min="1"
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Price</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-2 text-gray-500">$</span>
+                    <input type="number" id="itemPrice" required min="0.01" step="0.01"
+                           class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closeModal()" 
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    Add Item
+                </button>
+            </div>
+        </form>
+    `;
+    
+    createModal('Add New Item', modalContent);
+    
+    // Add form submit handler
+    document.getElementById('addItemForm').addEventListener('submit', handleAddItem);
+}
+
+// Handle add item form submission
+async function handleAddItem(e) {
+    e.preventDefault();
+    
+    const itemData = {
+        name: document.getElementById('itemName').value.trim(),
+        quantity: parseInt(document.getElementById('itemQuantity').value),
+        price: parseFloat(document.getElementById('itemPrice').value),
+        createdBy: currentUser.uid,
+        createdAt: Date.now(),
+        available: true,
+        isSubAdminItem: true // Flag to identify items added by sub-admin
+    };
+    
+    try {
+        // Generate a new item ID
+        const newItemRef = database.ref('items').push();
+        
+        // Save the item data
+        await newItemRef.set(itemData);
+        
+        // Close the modal
+        closeModal();
+        
+        // Show success notification
+        showNotification('Item added successfully', 'success');
+        
+        // Refresh items list
+        loadAvailableItems();
+        
+    } catch (error) {
+        console.error('Error adding item:', error);
+        showNotification('Error adding item', 'error');
+    }
+}
+
 // Load available items
 async function loadAvailableItems() {
     try {
-        // Get items assigned to this sub-admin
         const itemsRef = database.ref('items');
-        const snapshot = await itemsRef.orderByChild('assignedTo').equalTo(currentUser.uid).once('value');
-        
         availableItems = {};
-        if (snapshot.exists()) {
-            // Filter out items with quantity 0
-            const items = snapshot.val();
+
+        // Get items assigned to this sub-admin
+        const assignedSnapshot = await itemsRef.orderByChild('assignedTo').equalTo(currentUser.uid).once('value');
+        if (assignedSnapshot.exists()) {
+            const items = assignedSnapshot.val();
             Object.entries(items).forEach(([itemId, item]) => {
                 if (item.quantity > 0) {
-                    availableItems[itemId] = item;
+                    availableItems[itemId] = { ...item, isAssigned: true };
+                }
+            });
+        }
+
+        // Get items created by this sub-admin
+        const ownItemsSnapshot = await itemsRef.orderByChild('createdBy').equalTo(currentUser.uid).once('value');
+        if (ownItemsSnapshot.exists()) {
+            const items = ownItemsSnapshot.val();
+            Object.entries(items).forEach(([itemId, item]) => {
+                if (item.quantity > 0 && item.isSubAdminItem) {
+                    availableItems[itemId] = { ...item, isOwn: true };
                 }
             });
         }
@@ -373,6 +461,7 @@ async function loadAvailableItems() {
     }
 }
 
+// Display available items
 function displayAvailableItems() {
     const itemsGrid = document.getElementById('itemsGrid');
     
@@ -388,10 +477,7 @@ function displayAvailableItems() {
     
     const searchTerm = document.getElementById('itemSearch').value.toLowerCase();
     const filteredItems = Object.entries(availableItems).filter(([_, item]) => {
-        return (item.name.toLowerCase().includes(searchTerm) ||
-                item.description.toLowerCase().includes(searchTerm) ||
-                item.category.toLowerCase().includes(searchTerm)) &&
-               item.quantity > 0;  // Additional check for quantity
+        return item.name.toLowerCase().includes(searchTerm) && item.quantity > 0;
     });
     
     if (filteredItems.length === 0) {
@@ -409,21 +495,29 @@ function displayAvailableItems() {
             <div class="flex justify-between items-start mb-3">
                 <div>
                     <h4 class="font-semibold text-gray-800">${item.name}</h4>
-                    <p class="text-gray-600 text-sm">${item.description}</p>
                 </div>
-                <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-medium">
-                    ${item.category}
-                </span>
+                <div class="flex flex-col items-end space-y-1">
+                    ${item.isAssigned ? 
+                        `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium">
+                            Admin Assigned
+                        </span>` :
+                        `<span class="px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-medium">
+                            Your Item
+                        </span>`
+                    }
+                </div>
             </div>
             <div class="space-y-2 mb-4">
                 <p class="text-sm">
                     <span class="font-medium text-gray-700">Available Quantity:</span>
                     <span class="text-gray-600">${item.quantity}</span>
                 </p>
-                <p class="text-sm">
-                    <span class="font-medium text-gray-700">Assigned:</span>
-                    <span class="text-gray-600">${formatDate(item.assignedAt)}</span>
-                </p>
+                ${item.isAssigned ? 
+                    `<p class="text-sm">
+                        <span class="font-medium text-gray-700">Assigned:</span>
+                        <span class="text-gray-600">${formatDate(item.assignedAt)}</span>
+                    </p>` : ''
+                }
                 <div class="flex items-center space-x-2">
                     <span class="font-medium text-gray-700 text-sm">Price:</span>
                     <div class="relative flex-1">
@@ -597,28 +691,65 @@ async function handleCheckout() {
         
         const adminId = Object.keys(adminSnapshot.val())[0];
         
-        // Create purchase transaction
-        const transaction = {
-            type: 'purchase',
-            fromUserId: currentUser.uid,
-            toUserId: adminId,
-            amount: total,
-            description: `Purchase of ${shoppingCart.length} item(s)`,
-            items: shoppingCart.map(item => ({
-                itemId: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity
-            })),
-            status: 'completed',
-            timestamp: Date.now()
-        };
+        // Separate items by type
+        const adminItems = [];
+        const ownItems = [];
         
-        // Add transaction to database
-        const newTransactionRef = database.ref('transactions').push();
-        await newTransactionRef.set(transaction);
+        shoppingCart.forEach(item => {
+            const fullItem = availableItems[item.id];
+            if (fullItem.isAssigned) {
+                adminItems.push(item);
+            } else {
+                ownItems.push(item);
+            }
+        });
         
-        // Update only sub-admin's balance (reduce it)
+        // Create purchase transaction for admin-assigned items
+        if (adminItems.length > 0) {
+            const adminTransaction = {
+                type: 'purchase',
+                fromUserId: currentUser.uid,
+                toUserId: adminId,
+                amount: adminItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                description: `Purchase of ${adminItems.length} admin-assigned item(s)`,
+                items: adminItems.map(item => ({
+                    itemId: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                })),
+                status: 'completed',
+                timestamp: Date.now()
+            };
+            
+            // Add transaction to database
+            await database.ref('transactions').push().set(adminTransaction);
+        }
+        
+        // Create purchase transaction for own items
+        if (ownItems.length > 0) {
+            const ownTransaction = {
+                type: 'purchase',
+                fromUserId: currentUser.uid,
+                toUserId: currentUser.uid, // Self-transaction for own items
+                amount: ownItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                description: `Purchase of ${ownItems.length} own item(s)`,
+                items: ownItems.map(item => ({
+                    itemId: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                })),
+                status: 'completed',
+                timestamp: Date.now(),
+                isOwnItemPurchase: true // Flag to identify self-purchases
+            };
+            
+            // Add transaction to database
+            await database.ref('transactions').push().set(ownTransaction);
+        }
+        
+        // Update sub-admin's balance (reduce it)
         await database.ref(`accounts/${currentUser.uid}/balance`).transaction(balance => {
             return (balance || 0) - total;
         });
@@ -716,7 +847,7 @@ function getTransactionTitle(transaction) {
     const titles = {
         money_given: 'Money Received',
         money_returned: 'Money Returned',
-        purchase: 'Purchase',
+        purchase: transaction.isOwnItemPurchase ? 'Own Item Purchase' : 'Admin Item Purchase',
         transfer: 'Transfer to Admin'
     };
     return titles[transaction.type] || 'Transaction';

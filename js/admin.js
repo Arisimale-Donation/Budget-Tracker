@@ -106,7 +106,7 @@ function showSection(sectionName) {
             dashboard: 'Dashboard Overview',
             subadmins: 'Sub-Admin Management',
             financial: 'Financial Management',
-            items: 'Item Management',
+            items: '',
             history: 'Transaction History',
             settings: 'Settings'
         };
@@ -312,6 +312,15 @@ function getTransactionIcon(type) {
 
 // Get transaction description
 function getTransactionDescription(transaction) {
+    if (transaction.type === 'purchase' && transaction.items && transaction.items.length > 0) {
+        const itemsList = transaction.items.map(item => 
+            `${item.name} (${item.quantity}x at ${formatCurrency(item.price)})`
+        ).join(', ');
+        return transaction.isOwnItemPurchase ? 
+            `Own Purchase: ${itemsList}` : 
+            `Admin Item Purchase: ${itemsList}`;
+    }
+
     const descriptions = {
         money_given: 'Money sent to sub-admin',
         money_returned: 'Money returned from sub-admin',
@@ -630,28 +639,10 @@ function showAddItemModal() {
                        placeholder="Enter item name">
             </div>
             <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                <textarea id="itemDescription" rows="3" required
-                          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Enter item description"></textarea>
-            </div>
-            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Quantity</label>
                 <input type="number" id="itemQuantity" required min="1"
                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                        placeholder="Enter quantity">
-            </div>
-            <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Category</label>
-                <select id="itemCategory" required
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Select category</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="furniture">Furniture</option>
-                    <option value="supplies">Supplies</option>
-                    <option value="tools">Tools</option>
-                    <option value="other">Other</option>
-                </select>
             </div>
             <div class="flex justify-end space-x-3">
                 <button type="button" onclick="closeModal()" 
@@ -678,9 +669,7 @@ async function handleAddItem(e) {
     
     const itemData = {
         name: document.getElementById('itemName').value.trim(),
-        description: document.getElementById('itemDescription').value.trim(),
         quantity: parseInt(document.getElementById('itemQuantity').value),
-        category: document.getElementById('itemCategory').value,
         createdBy: currentUser.uid,
         createdAt: Date.now(),
         available: true,
@@ -715,7 +704,6 @@ function showAssignItemModal(itemId) {
         <form id="assignItemForm" class="space-y-4" data-item-id="${itemId}">
             <div>
                 <p class="text-gray-700 font-bold">Item: ${item.name}</p>
-                <p class="text-gray-600 text-sm">${item.description}</p>
             </div>
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Select Sub-Admin</label>
@@ -788,7 +776,20 @@ function displayItems() {
         return;
     }
     
-    const itemsHtml = Object.entries(itemsData).map(([itemId, item]) => {
+    // Filter out sub-admin's custom items
+    const adminItems = Object.entries(itemsData).filter(([_, item]) => !item.isSubAdminItem);
+    
+    if (adminItems.length === 0) {
+        itemsList.innerHTML = `
+            <div class="text-center text-gray-500 col-span-full py-8">
+                <i class="fas fa-box text-3xl mb-2"></i>
+                <p>No admin items found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const itemsHtml = adminItems.map(([itemId, item]) => {
         const assignedTo = item.assignedTo ? subAdminsData[item.assignedTo]?.name || 'Unknown Sub-Admin' : 'Not Assigned';
         const statusClass = item.available ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
         const statusText = item.available ? 'Available' : 'Assigned';
@@ -798,17 +799,12 @@ function displayItems() {
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h4 class="text-lg font-semibold text-gray-800">${item.name}</h4>
-                        <p class="text-gray-600 text-sm">${item.description}</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-sm font-medium ${statusClass}">
                         ${statusText}
                     </span>
                 </div>
                 <div class="space-y-2">
-                    <p class="text-sm">
-                        <span class="font-medium">Category:</span> 
-                        <span class="text-gray-600">${item.category}</span>
-                    </p>
                     <p class="text-sm">
                         <span class="font-medium">Quantity:</span> 
                         <span class="text-gray-600">${item.quantity}</span>
@@ -876,13 +872,29 @@ function displayTransactionHistory() {
         return;
     }
     
-    tableBody.innerHTML = transactions.map(([id, transaction]) => `
+    tableBody.innerHTML = transactions.map(([id, transaction]) => {
+        // Generate detailed description for purchases
+        let description = transaction.description || '';
+        if (transaction.type === 'purchase' && transaction.items && transaction.items.length > 0) {
+            const itemsList = transaction.items.map(item => 
+                `${item.name} (${item.quantity}x at ${formatCurrency(item.price)})`
+            ).join(', ');
+            description = transaction.isOwnItemPurchase ? 
+                `Own Purchase: ${itemsList}` : 
+                `Admin Item Purchase: ${itemsList}`;
+        }
+
+        return `
         <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatDate(transaction.timestamp)}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${transaction.type.replace('_', ' ')}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${getTransactionParty(transaction)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">${formatCurrency(transaction.amount || 0)}</td>
-            <td class="px-6 py-4 text-sm text-gray-900">${transaction.description || 'N/A'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm ${
+                transaction.type === 'money_given' ? 'text-red-600' : 
+                transaction.type === 'money_returned' ? 'text-green-600' : 
+                'text-gray-900'
+            }">${formatCurrency(transaction.amount || 0)}</td>
+            <td class="px-6 py-4 text-sm text-gray-900">${description || 'N/A'}</td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <span class="px-2 py-1 text-xs font-semibold rounded-full ${
                     transaction.status === 'completed' ? 'bg-green-100 text-green-800' : 
@@ -893,18 +905,37 @@ function displayTransactionHistory() {
                 </span>
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Get transaction party (from/to)
 function getTransactionParty(transaction) {
+    // For money request transactions, show who requested the money
+    if (transaction.type === 'money_request') {
+        const subAdmin = subAdminsData[transaction.fromUserId];
+        return subAdmin ? `Requested by ${subAdmin.name}` : 'Unknown';
+    }
+    
+    // For sub-admin's own item purchases
+    if (transaction.type === 'purchase' && transaction.isOwnItemPurchase) {
+        const subAdmin = subAdminsData[transaction.fromUserId];
+        return subAdmin ? `${subAdmin.name} (Own Purchase)` : 'Unknown';
+    }
+    
+    // For other transaction types
     if (transaction.fromUserId === currentUser.uid) {
         const subAdmin = subAdminsData[transaction.toUserId];
         return subAdmin ? subAdmin.name : 'Unknown';
     } else if (transaction.toUserId === currentUser.uid) {
         const subAdmin = subAdminsData[transaction.fromUserId];
         return subAdmin ? subAdmin.name : 'Unknown';
+    } else if (transaction.fromUserId === transaction.toUserId) {
+        // Self-transactions (like sub-admin's own purchases)
+        const subAdmin = subAdminsData[transaction.fromUserId];
+        return subAdmin ? `${subAdmin.name} (Self)` : 'Unknown';
     }
+    
     return 'N/A';
 }
 

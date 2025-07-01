@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sub-Admin Dashboard - Dual Dashboard System</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +12,7 @@
     <link rel="apple-touch-icon" href="images/app_icon.png">
     <!-- Android PWA Support -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#fff">
+    <meta name="theme-color" content="#667eea">
     <meta name="mobile-web-app-capable" content="yes">
     <style>
         /* Mobile-first custom styles */
@@ -195,6 +194,9 @@
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">Available Items</h3>
                     <div class="flex items-center space-x-2">
+                        <button id="addItemBtn" class="p-2 bg-green-600 text-white rounded-lg">
+                            <i class="fas fa-plus"></i>
+                        </button>
                         <button id="cartBtn" class="relative p-2 bg-purple-600 text-white rounded-lg">
                             <i class="fas fa-shopping-cart"></i>
                             <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
