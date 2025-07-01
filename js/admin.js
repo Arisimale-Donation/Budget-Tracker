@@ -43,6 +43,9 @@ function setupEventListeners() {
     document.getElementById('assignItemsBtn').addEventListener('click', () => showSection('items'));
     document.getElementById('viewReportsBtn').addEventListener('click', () => showSection('history'));
     
+    // Sub-Admin Management button
+    document.getElementById('addNewSubAdmin').addEventListener('click', () => showAddSubAdminModal());
+    
     // Form submissions
     document.getElementById('addMoneyForm').addEventListener('submit', handleAddMoney);
     document.getElementById('transferMoneyForm').addEventListener('submit', handleTransferMoney);

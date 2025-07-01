@@ -1,17 +1,21 @@
 {
-  "name": "My Wallet",
-  "short_name": "My Wallet",
-  "description": "My Wallet",
-  "start_url": "/login.html",
+  "name": "MY WALLET",
+  "short_name": "Wallet",
+  "description": "Sub-Admin Dashboard for Dual Dashboard System",
+  "start_url": "/sub-admin.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#3B82F6",
+  "theme_color": "#667eea",
   "icons": [
     {
       "src": "images/app_icon.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
+    },
+    {
+      "src": "images/app_icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 } 
