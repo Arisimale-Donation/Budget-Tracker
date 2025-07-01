@@ -2,7 +2,7 @@
   "name": "MY WALLET",
   "short_name": "Wallet",
   "description": "Sub-Admin Dashboard for Dual Dashboard System",
-  "start_url": "/sub-admin.html",
+  "start_url": "https://arisimale-donation.github.io/Budget-Tracker/sub-admin.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#667eea",
