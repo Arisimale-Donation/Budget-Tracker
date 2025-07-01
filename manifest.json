@@ -5,7 +5,7 @@
   "start_url": "/Budget-Tracker/sub-admin.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#667eea",
+  "theme_color": "#fff",
   "icons": [
     {
       "src": "images/app_icon.png",
