@@ -288,8 +288,8 @@ function loadRecentActivity() {
                         <p class="text-sm text-gray-500">${date}</p>
                     </div>
                 </div>
-                <span class="font-semibold ${transaction.type === 'money_given' ? 'text-red-600' : 'text-green-600'}">
-                    ${transaction.type === 'money_given' ? '-' : '+'}${amount}
+                <span class="font-semibold ${transaction.type === 'purchase' ? 'text-blue-600' : transaction.type === 'money_given' ? 'text-red-600' : 'text-green-600'}">
+                    ${transaction.type === 'money_given' ? '-' : transaction.type === 'purchase' ? '✓' : '+'}${amount}
                 </span>
             </div>
         `;
@@ -1130,5 +1130,29 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         notificationContainer.remove();
     }, 3000);
+}
+
+// Update dashboard metrics
+async function updateDashboardMetrics() {
+    try {
+        // Update main account balance
+        const mainBalance = await getUserBalance(currentUser.uid);
+        document.getElementById('mainBalance').textContent = formatCurrency(mainBalance);
+
+        // Update money distributed and returned
+        const moneyDistributed = Object.values(transactionsData || {})
+            .filter(t => t.type === 'money_given')
+            .reduce((sum, t) => sum + (t.amount || 0), 0);
+        
+        const moneyReturned = Object.values(transactionsData || {})
+            .filter(t => t.type === 'money_returned')
+            .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+        document.getElementById('moneyDistributed').textContent = formatCurrency(moneyDistributed);
+        document.getElementById('moneyReturned').textContent = formatCurrency(moneyReturned);
+    } catch (error) {
+        console.error('Error updating dashboard metrics:', error);
+        showNotification('Failed to update dashboard metrics', 'error');
+    }
 }
 

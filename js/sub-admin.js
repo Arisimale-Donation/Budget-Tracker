@@ -234,8 +234,18 @@ function updateBalanceDisplay() {
 
 // Update quick stats
 function updateQuickStats() {
-    const totalReceived = accountData.totalReceived || 0;
-    const totalSpent = accountData.totalSpent || 0;
+    let totalReceived = 0;
+    let totalSpent = 0;
+    
+    // Calculate totals from transaction history
+    Object.values(transactionHistory).forEach(transaction => {
+        if (transaction.toUserId === currentUser.uid && transaction.type === 'money_given') {
+            totalReceived += transaction.amount || 0;
+        } else if (transaction.fromUserId === currentUser.uid && transaction.type === 'purchase') {
+            // Only include purchase transactions in total spent
+            totalSpent += transaction.amount || 0;
+        }
+    });
     
     document.getElementById('totalReceived').textContent = formatCurrency(totalReceived);
     document.getElementById('totalSpent').textContent = formatCurrency(totalSpent);
