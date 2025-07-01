@@ -226,9 +226,16 @@ function updateBalanceDisplay() {
     document.getElementById('currentBalance').textContent = formatCurrency(balance);
     document.getElementById('lastUpdated').textContent = formatDate(accountData.updatedAt);
     
-    // Update budget progress (assuming a budget limit)
-    const budgetLimit = 1000; // This could be dynamic
-    const percentage = Math.min((balance / budgetLimit) * 100, 100);
+    // Calculate total spent from transaction history
+    let totalSpent = 0;
+    Object.values(transactionHistory || {}).forEach(transaction => {
+        if (transaction.fromUserId === currentUser.uid && transaction.type === 'purchase') {
+            totalSpent += transaction.amount || 0;
+        }
+    });
+    
+    // Calculate usage percentage based on Total Spend / Current Balance * 100%
+    const percentage = balance > 0 ? Math.min((totalSpent / balance) * 100, 100) : 0;
     document.getElementById('budgetProgress').style.width = `${percentage}%`;
     document.getElementById('budgetPercentage').textContent = `${Math.round(percentage)}%`;
 }
@@ -798,7 +805,17 @@ function displayTransactionHistory() {
         return;
     }
     
-    container.innerHTML = transactions.map(([id, transaction]) => `
+    container.innerHTML = transactions.map(([id, transaction]) => {
+        // Generate item list for purchases
+        let description = '';
+        if (transaction.type === 'purchase' && transaction.items && transaction.items.length > 0) {
+            const itemsList = transaction.items.map(item => 
+                `${item.name} (${item.quantity}x)`
+            ).join(', ');
+            description = itemsList;
+        }
+
+        return `
         <div class="bg-white rounded-xl card-shadow p-4">
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center">
@@ -814,10 +831,10 @@ function displayTransactionHistory() {
                     ${transaction.type === 'purchase' || transaction.type === 'transfer' ? '-' : '+'}${formatCurrency(transaction.amount || 0)}
                 </span>
             </div>
-            ${transaction.description ? `<p class="text-sm text-gray-600 ml-13">${transaction.description}</p>` : ''}
-            ${transaction.items ? `<div class="ml-13 mt-2"><p class="text-xs text-gray-500">${transaction.items.length} item(s)</p></div>` : ''}
+            ${description ? `<p class="text-sm text-gray-600 ml-13">${description}</p>` : ''}
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Get transaction color
@@ -847,7 +864,7 @@ function getTransactionTitle(transaction) {
     const titles = {
         money_given: 'Money Received',
         money_returned: 'Money Returned',
-        purchase: transaction.isOwnItemPurchase ? 'Own Item Purchase' : 'Admin Item Purchase',
+        purchase: transaction.isOwnItemPurchase ? 'Own Purchase' : 'Admin Item Purchase',
         transfer: 'Transfer to Admin'
     };
     return titles[transaction.type] || 'Transaction';

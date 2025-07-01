@@ -57,6 +57,12 @@
                     </a>
                 </li>
                 <li class="mb-2">
+                    <a href="#" data-section="reports" class="nav-link flex items-center py-3 px-4 hover:bg-gray-700 transition-colors duration-200 sidebar-icon">
+                        <i class="fas fa-file-pdf w-6"></i>
+                        <span class="ml-3 sidebar-text">Get Reports</span>
+                    </a>
+                </li>
+                <li class="mb-2">
                     <a href="#" data-section="history" class="nav-link flex items-center py-3 px-4 hover:bg-gray-700 transition-colors duration-200 sidebar-icon">
                         <i class="fas fa-history w-6"></i>
                         <span class="ml-3 sidebar-text">History</span>
@@ -326,6 +332,151 @@
                 </div>
             </div>
 
+            <!-- Reports Section -->
+            <div id="reports-section" class="section hidden">
+                <div class="bg-white rounded-lg shadow-sm border">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">Generate Reports</h3>
+                        <p class="text-gray-600 mt-1">Generate and download various reports in PDF format</p>
+                        
+                        <!-- Date Filter Controls -->
+                        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="flex flex-wrap gap-4 items-end">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                                    <select id="dateRangeSelect" class="mt-1 block w-48 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="all">All Time</option>
+                                        <option value="today">Today</option>
+                                        <option value="yesterday">Yesterday</option>
+                                        <option value="thisWeek">This Week</option>
+                                        <option value="lastWeek">Last Week</option>
+                                        <option value="thisMonth">This Month</option>
+                                        <option value="lastMonth">Last Month</option>
+                                        <option value="custom">Custom Range</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="customDateRange" class="hidden flex gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                                        <input type="date" id="startDate" class="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                                        <input type="date" id="endDate" class="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Financial Report Card -->
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="p-3 bg-blue-100 rounded-full">
+                                        <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <select id="financialReportType" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            <option value="detailed">Detailed</option>
+                                            <option value="summary">Summary</option>
+                                        </select>
+                                        <button id="generateFinancialReport" class="text-blue-600 hover:text-blue-700 p-2">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="text-lg font-semibold mb-2">Financial Report</h4>
+                                <p class="text-gray-600 text-sm mb-4">Comprehensive financial transactions and balance report</p>
+                                <div class="space-y-2">
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Transaction history
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Balance summary
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Trend analysis
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sub-Admin Report Card -->
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="p-3 bg-green-100 rounded-full">
+                                        <i class="fas fa-users text-green-600 text-xl"></i>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <select id="subAdminReportType" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            <option value="performance">Performance</option>
+                                            <option value="activity">Activity Log</option>
+                                        </select>
+                                        <button id="generateSubAdminReport" class="text-green-600 hover:text-green-700 p-2">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="text-lg font-semibold mb-2">Sub-Admin Report</h4>
+                                <p class="text-gray-600 text-sm mb-4">Detailed sub-admin activity and performance report</p>
+                                <div class="space-y-2">
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Performance metrics
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Transaction history
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Activity timeline
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Items Report Card -->
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="p-3 bg-purple-100 rounded-full">
+                                        <i class="fas fa-box-open text-purple-600 text-xl"></i>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <select id="itemsReportType" class="text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            <option value="distribution">Distribution</option>
+                                            <option value="inventory">Inventory</option>
+                                        </select>
+                                        <button id="generateItemsReport" class="text-purple-600 hover:text-purple-700 p-2">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="text-lg font-semibold mb-2">Items Report</h4>
+                                <p class="text-gray-600 text-sm mb-4">Complete items distribution and status report</p>
+                                <div class="space-y-2">
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Distribution details
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Status tracking
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        Assignment history
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- History Section -->
             <div id="history-section" class="section hidden">
                 <div class="bg-white rounded-lg shadow-sm border">
@@ -433,10 +584,16 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
-    <!-- Custom Scripts -->
-    <script src="./js/firebase-config.js"></script>
-    <script src="./js/auth.js"></script>
-    <script src="./js/admin.js"></script>
+    <!-- Scripts -->
+    <!-- Load jsPDF and dependencies first -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Then load application scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/generate.js"></script>
 </body>
 </html>
 

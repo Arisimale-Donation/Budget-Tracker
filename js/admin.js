@@ -249,7 +249,10 @@ function updateFinancialMetrics() {
         }
     });
     
-    document.getElementById('moneyDistributed').textContent = formatCurrency(moneyGiven);
+    // Calculate net money distributed by subtracting returned money
+    const netMoneyDistributed = Math.max(0, moneyGiven - moneyReturned);
+    
+    document.getElementById('moneyDistributed').textContent = formatCurrency(netMoneyDistributed);
     document.getElementById('moneyReturned').textContent = formatCurrency(moneyReturned);
 }
 
