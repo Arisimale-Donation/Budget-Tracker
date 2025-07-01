@@ -6,6 +6,27 @@
     <title>Login - Dual Dashboard System</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MY WALLET">
+    <link rel="apple-touch-icon" href="images/app_icon.png">
+    <!-- Android PWA Support -->
+    <link rel="manifest" href="/Budget-Tracker/manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/Budget-Tracker/sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch((err) => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
 </head>
 <body class="bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">

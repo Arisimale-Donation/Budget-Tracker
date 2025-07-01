@@ -2,8 +2,7 @@
   "name": "MY WALLET",
   "short_name": "Wallet",
   "description": "Sub-Admin Dashboard for Dual Dashboard System",
-  "start_url": "/Budget-Tracker/login.html",
-  "scope": "/Budget-Tracker/"
+  "start_url": "/Budget-Tracker/sub-admin.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#667eea",

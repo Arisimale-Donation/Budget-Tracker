@@ -12,9 +12,21 @@
     <link rel="apple-touch-icon" href="images/app_icon.png">
     <!-- Android PWA Support -->
     <link rel="manifest" href="/Budget-Tracker/manifest.json">
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#667eea">
     <meta name="mobile-web-app-capable" content="yes">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/Budget-Tracker/sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch((err) => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
     <style>
         /* Mobile-first custom styles */
         .balance-card {
@@ -49,7 +61,6 @@
             50% { opacity: 0.7; }
         }
     </style>
-    
 </head>
 <body class="bg-gray-50 min-h-screen pb-20">
     <!-- Header -->
@@ -367,11 +378,6 @@
     <script src="./js/firebase-config.js"></script>
     <script src="./js/auth.js"></script>
     <script src="./js/sub-admin.js"></script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/Budget-Tracker/js/service-worker.js');
-  }
-</script>
 </body>
 </html>
 
