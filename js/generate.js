@@ -673,44 +673,9 @@ async function initializeItemsIfNeeded() {
         const snapshot = await itemsRef.once('value');
         
         if (!snapshot.exists()) {
-            // Sample items data with purchase information
-            const initialItems = {
-                item1: {
-                    name: 'Laptop',
-                    category: 'Electronics',
-                    quantity: 5,
-                    price: 1299.99,
-                    purchasedBy: 'admin',
-                    purchaseDate: '2024-01-15',
-                    serialNumber: 'LT-2024-001',
-                    notes: 'Dell XPS 15'
-                },
-                item2: {
-                    name: 'Headphone',
-                    category: 'Electronics',
-                    quantity: 10,
-                    price: 349.99,
-                    purchasedBy: 'admin',
-                    purchaseDate: '2024-01-20',
-                    serialNumber: 'HP-2024-001',
-                    notes: 'Sony WH-1000XM4'
-                },
-                item3: {
-                    name: 'HDMI Adapter',
-                    category: 'Accessories',
-                    quantity: 20,
-                    price: 29.99,
-                    purchasedBy: 'admin',
-                    purchaseDate: '2024-01-25',
-                    serialNumber: 'HA-2024-001',
-                    notes: 'USB-C to HDMI'
-                }
-            };
-
-            await itemsRef.set(initialItems);
-            console.log('Items initialized successfully');
+            console.log('No items found in database');
         }
     } catch (error) {
-        console.error('Error initializing items:', error);
+        console.error('Error checking items:', error);
     }
 }
