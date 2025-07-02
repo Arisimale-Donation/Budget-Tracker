@@ -1,14 +1,13 @@
 // Firebase configuration
 // Replace with your actual Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAG7iyDcdPWFK21tg0cxGDOvNAt8aD0Jog",
-    authDomain: "budget-tracker-bf232.firebaseapp.com",
-    databaseURL: "https://budget-tracker-bf232-default-rtdb.firebaseio.com",
-    projectId: "budget-tracker-bf232",
-    storageBucket: "budget-tracker-bf232.firebasestorage.app",
-    messagingSenderId: "369163526936",
-    appId: "1:369163526936:web:d0b0e2a5366c5900a6746d",
-    measurementId: "G-4PRLS0R966"
+    apiKey: "AIzaSyBnzHm98CVvJJAPObGuxg2N3ynXEYJ5KkM",
+  authDomain: "my-wallet-82048.firebaseapp.com",
+  projectId: "my-wallet-82048",
+  storageBucket: "my-wallet-82048.firebasestorage.app",
+  messagingSenderId: "340468198241",
+  appId: "1:340468198241:web:7440dfbf02146d1caaf320",
+  measurementId: "G-QTE88N5LYG"
 };
 
 // Initialize Firebase
